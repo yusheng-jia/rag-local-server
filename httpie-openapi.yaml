@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: AI Local Server API
+  version: 1.0.0
+  description: Local API for health/info/models and chat.
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: healthy
+                      timestamp:
+                        type: string
+                        format: date-time
+                      uptime:
+                        type: number
+  /api/info:
+    get:
+      summary: Service info
+      responses:
+        "200":
+          description: Service metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: AI Local Server
+                      version:
+                        type: string
+                        example: 1.0.0
+                      description:
+                        type: string
+                      endpoints:
+                        type: array
+                        items:
+                          type: string
+  /api/models:
+    get:
+      summary: Supported models
+      responses:
+        "200":
+          description: Model list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: object
+                    properties:
+                      models:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            provider:
+                              type: string
+                            features:
+                              type: array
+                              items:
+                                type: string
+  /api/chat:
+    post:
+      summary: Chat with the AI assistant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - input
+              properties:
+                input:
+                  type: string
+                  example: 我觉得坐圈有点烫，怎么调更舒适？
+                context:
+                  type: object
+                  additionalProperties: true
+                  example:
+                    mode: standard
+                    waterTemp: high
+                    seatHeat: on
+                    nightMode: true
+                history:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum: [system, user, assistant, ai]
+                      content:
+                        type: string
+      responses:
+        "200":
+          description: AI response messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: object
+                    properties:
+                      messages:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+        "400":
+          description: Bad request
+        "500":
+          description: Server error
+        "502":
+          description: AI response format error

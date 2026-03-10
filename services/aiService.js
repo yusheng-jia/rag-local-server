@@ -1,15 +1,26 @@
 const OpenAI = require("openai");
 const { genId } = require("../utils/id");
 
-const client = new OpenAI({
-  apiKey: process.env.DASHSCOPE_API_KEY,
-  baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-});
+let client = null;
+function getClient() {
+  if (!process.env.DASHSCOPE_API_KEY) {
+    throw new Error("DASHSCOPE_API_KEY is not configured");
+  }
+
+  if (!client) {
+    client = new OpenAI({
+      apiKey: process.env.DASHSCOPE_API_KEY,
+      baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    });
+  }
+
+  return client;
+}
 
 const { searchManual } = require("./manualService");
 
 /**
- * 系统 Prompt：这是整个 AI 行为的“宪法”
+ * Phase 1：仅问答，不做设备控制建议/动作下发
  */
 const SYSTEM_PROMPT = `
 你是【某品牌智能卫浴设备】的 AI 使用顾问，主要服务对象是【智能马桶】用户。
@@ -31,36 +42,12 @@ const SYSTEM_PROMPT = `
 3. 不编造故障原因
 4. 不给出维修拆机或内部结构建议
 5. 不输出任何与设备无关的内容
-6. 永远使用【指定 JSON 协议】输出
-7. 禁止输出 Markdown、代码块、解释性文字
+6. 仅进行“解释/建议”问答，不输出任何可执行设备动作
+7. 不做用户习惯学习、不做个性化画像推断
+8. 永远使用【指定 JSON 协议】输出
+9. 禁止输出 Markdown、代码块、解释性文字
 
-什么时候使用 card：
-- 用户询问：是否合适、是否费电、怎么调、推荐设置、维护建议
-- 用户反馈：不舒服、效果不好、担心耗电
-- 需要给出【建议 + 原因 + 可执行操作】时
-
-什么时候使用 text：
-- 简单解释
-- 状态确认
-- 已执行操作反馈
-- 无需立即调整设备参数的情况
-
-card 的 action 规则：
-- action.key 必须来自以下集合：
-  - set_mode_soft
-  - set_mode_standard
-  - set_mode_strong
-  - temp_down
-  - temp_up
-  - seat_heat_off
-  - seat_heat_on
-  - night_mode_on
-  - night_mode_off
-- 如果不需要立即执行设备操作，可以不返回 actions
-
-【指定 JSON 协议】：
-
-文本消息：
+【指定 JSON 协议】（仅 text）：
 {
   "messages": [
     {
@@ -72,24 +59,7 @@ card 的 action 规则：
   ]
 }
 
-卡片消息：
-{
-  "messages": [
-    {
-      "id": "string",
-      "role": "ai",
-      "type": "card",
-      "title": "string",
-      "status": ["string"],
-      "reason": "string",
-      "actions": [
-        { "key": "string", "text": "string" }
-      ]
-    }
-  ]
-}
-
-⚠️ 不允许返回其它结构
+⚠️ 不允许返回 card、actions 或其它结构
 `;
 
 /**
@@ -168,6 +138,34 @@ function parseModelJson(raw) {
   }
 }
 
+function normalizeMessages(messages) {
+  return messages
+    .map((msg) => {
+      // Phase 1 强制 text：即使模型漂移输出 card，也降级为可读文本
+      if (msg && msg.type === "card") {
+        const cardText = [msg.title, msg.reason]
+          .filter(Boolean)
+          .join("：")
+          .trim();
+
+        return {
+          id: msg.id || genId(),
+          role: "ai",
+          type: "text",
+          content: cardText || "请参考设备手册进行相关设置。",
+        };
+      }
+
+      return {
+        id: msg.id || genId(),
+        role: "ai",
+        type: "text",
+        content: typeof msg?.content === "string" ? msg.content : "",
+      };
+    })
+    .filter((msg) => msg.content);
+}
+
 /**
  * 核心方法：给 router 调用
  */
@@ -197,7 +195,7 @@ async function handleChat({ input, context, history }) {
       `;
   }
 
-  const completion = await client.chat.completions.create({
+  const completion = await getClient().chat.completions.create({
     model: "qwen-plus",
     temperature: 0.3,
     messages: buildMessages({
@@ -218,12 +216,11 @@ async function handleChat({ input, context, history }) {
     throw new Error("AI messages invalid");
   }
 
-  // 给 message 自动补 id（防止前端炸）
-  parsed.messages = parsed.messages.map((msg) => ({
-    id: msg.id || genId(),
-    role: "ai",
-    ...msg,
-  }));
+  parsed.messages = normalizeMessages(parsed.messages);
+
+  if (parsed.messages.length === 0) {
+    throw new Error("AI messages invalid");
+  }
 
   console.log("✅ AI parsed messages:", parsed.messages);
 

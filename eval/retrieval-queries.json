@@ -1,0 +1,82 @@
+[
+  {
+    "query": "遥控器如何连接到马桶",
+    "expected_ids": ["remote_pairing_01", "troubleshooting_01"]
+  },
+  {
+    "query": "遥控器连不上怎么办",
+    "expected_ids": ["remote_pairing_01", "troubleshooting_01"]
+  },
+  {
+    "query": "怎么更换遥控器电池",
+    "expected_ids": ["remote_battery_01", "troubleshooting_01"]
+  },
+  {
+    "query": "遥控器使用时有什么注意事项",
+    "expected_ids": ["remote_notice_01", "remote_usage_01"]
+  },
+  {
+    "query": "自动冲水怎么设置",
+    "expected_ids": ["remote_setting_01", "flush_01"]
+  },
+  {
+    "query": "脚感冲水是怎么用的",
+    "expected_ids": ["flush_01", "remote_setting_01"]
+  },
+  {
+    "query": "坐便器不冲水了怎么办",
+    "expected_ids": ["troubleshooting_01", "flush_01"]
+  },
+  {
+    "query": "如何进入待机模式",
+    "expected_ids": ["standby_mode_01", "aux_keyboard_01"]
+  },
+  {
+    "query": "UV除菌功能如何开启",
+    "expected_ids": ["uv_sterilization_01", "remote_setting_01"]
+  },
+  {
+    "query": "这个产品怎么省电",
+    "expected_ids": ["auto_energy_01", "standby_mode_01"]
+  },
+  {
+    "query": "除臭功能什么时候会启动",
+    "expected_ids": ["deodorization_01", "troubleshooting_01"]
+  },
+  {
+    "query": "久坐提醒是什么",
+    "expected_ids": ["long_toilet_reminder_01", "remote_setting_01"]
+  },
+  {
+    "query": "怎么清洗喷嘴",
+    "expected_ids": ["maintenance_cleaning_01"]
+  },
+  {
+    "query": "滤网堵了怎么处理",
+    "expected_ids": ["maintenance_cleaning_01", "troubleshooting_01"]
+  },
+  {
+    "query": "产品额定电压和功率是多少",
+    "expected_ids": ["spec_01"]
+  },
+  {
+    "query": "初次使用前需要准备什么",
+    "expected_ids": ["first_use_prep_01"]
+  },
+  {
+    "query": "盖子和坐圈怎么开关",
+    "expected_ids": ["seat_cover_control_01", "remote_usage_01"]
+  },
+  {
+    "query": "辅助键盘都有什么功能",
+    "expected_ids": ["aux_keyboard_01"]
+  },
+  {
+    "query": "产品里有害物质说明在哪里看",
+    "expected_ids": ["hazard_material_01"]
+  },
+  {
+    "query": "遇到故障应该怎么排查",
+    "expected_ids": ["troubleshooting_01"]
+  }
+]

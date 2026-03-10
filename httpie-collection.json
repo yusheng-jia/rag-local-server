@@ -1,0 +1,95 @@
+{
+  "info": {
+    "_postman_id": "8f790f18-a0fe-47f2-8f7c-b84ddd4d9805",
+    "name": "AI Local Server",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/info",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "info"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Models",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/models",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "models"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"input\": \"我觉得坐圈有点烫，怎么调更舒适？\",\n  \"context\": {\n    \"mode\": \"standard\",\n    \"waterTemp\": \"high\",\n    \"seatHeat\": \"on\",\n    \"nightMode\": true\n  },\n  \"history\": []\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/chat",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "chat"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
+    "eval:retrieval": "node utils/evaluate-retrieval.js",
     "test": "echo \"No tests configured\""
   },
   "keywords": [],
